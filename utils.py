@@ -14,7 +14,12 @@ COLORS = {
 
 def create_dir(path):
     try:
-        print(f"Creating dir {path}")
         makedirs(path + '/', exist_ok=True)
     except OSError as error:
         print(error)
+
+
+def display_message(link: str, status='FAIL'): 
+    print(COLORS[status])
+    print(f"Login {status} for address {link}.")
+    print(f"{COLORS['ENDC']}")
