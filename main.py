@@ -61,7 +61,7 @@ def scrap_intranet(payload: dict, login_link: str, elearning_link: str) -> None:
         find_videos(session, elearning_response, getcwd())
 
 
-def get_links(soup, filters: dict):
+def get_links(soup, filters: dict) -> list:
     '''returns a list of links who's parent html attributes match filters'''
     links = []
     all_links = soup.find(attrs=filters)
@@ -73,7 +73,7 @@ def get_links(soup, filters: dict):
     return links
 
 
-def find_videos(session: requests.Session, req: requests.Response, path: str):
+def find_videos(session: requests.Session, req: requests.Response, path: str) -> None:
     '''Recursively searches for links whos attributes or parents attributes
     match the filter argument. Then downloads the videos if it found any.'''
     soup = BeautifulSoup(req.content, 'html5lib')
