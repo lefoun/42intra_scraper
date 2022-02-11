@@ -6,9 +6,9 @@ import html5lib
 from utils import create_dir, display_message, COLORS
 
 
-def get_mp4_link(video_tag):
-    '''Returns a link that ends with '.mp4' if any by iterating on the contents
-    of <video> tag'''
+def get_mp4_link(video_tag: BeautifulSoup) -> str:
+    '''Returns a link that ends with '.mp4' (if any) by iterating
+    on the contents of <video> tag'''
     for content in video_tag:
         if content != '\n' and 'SD' in content.attrs.values():
             return content['src']
@@ -22,30 +22,28 @@ def download_video(link: str, path: str) -> None:
         print(f"{COLORS['WARNING']}Video {file_name} already exists{COLORS['ENDC']}")
         return
     req_download = requests.get(link, stream=True)
-    with open(path + '/' + file_name, 'wb') as f:
+    with open(path + '/' + file_name, 'wb') as file:
         print("Downloading video "
                 f"{COLORS['OKBLUE']}{file_name}{COLORS['ENDC']}...")
         for chunk in req_download.iter_content(chunk_size=1024*1024):
             if chunk:
-                f.write(chunk)
+                file.write(chunk)
     print("Video "
         f"{COLORS['OKBLUE']}{file_name}{COLORS['ENDC']} finished downloading")
 
 
 def get_auth_token(session: requests.Session, login_link: str) -> str:
     '''get the authenticity token required to login to 42 intranet'''
-    get_req = session.get(login_link)
-    soup = BeautifulSoup(get_req.content, 'html5lib')
+    response = session.get(login_link)
+    soup = BeautifulSoup(response.content, 'html5lib')
     auth_token = soup.find("input", {"name": "authenticity_token"}).get('value')
     return auth_token
 
 
-def check_login(login_response: requests.Response) -> bool:
-    '''
-    Checks if we logged in successfuly so that we can quit the program if not
-    '''
+def check_login(login_response: requests.Response, usr_name: str) -> bool:
+    '''Verify we are logged in'''
     soup = BeautifulSoup(login_response.content, 'html5lib')
-    logged_in_attribute = soup.find_all("span", attrs={'data-login':'nammari'})
+    logged_in_attribute = soup.find("span", attrs={'data-login': usr_name})
     if logged_in_attribute:
         return True
     return False
@@ -55,7 +53,7 @@ def scrap_intranet(payload: dict, login_link: str, elearning_link: str) -> None:
     with requests.Session() as session:
         payload['authenticity_token'] = get_auth_token(session, login_link)
         login_response = session.post(login_link, data=payload)
-        if check_login(login_response) is False:
+        if check_login(login_response, payload['user[login]']) is False:
             display_message(login_link, 'FAIL')
             return
         display_message(login_link, 'SUCCESS')
@@ -66,22 +64,18 @@ def scrap_intranet(payload: dict, login_link: str, elearning_link: str) -> None:
 def get_links(soup, filters: dict):
     '''returns a list of links who's parent html attributes match filters'''
     links = []
-    all_links = soup.find_all(attrs=filters)
-    if not all_links:
-        return []
-    children = all_links[0].findChildren()
-    for child in children:
-        if 'href' in child.attrs.keys():
-            links.append(INTRA_PREFIX_LINK + child['href'])
+    all_links = soup.find(attrs=filters)
+    if all_links:
+        children = all_links.findChildren()
+        for child in children:
+            if 'href' in child.attrs.keys():
+                links.append(INTRA_PREFIX_LINK + child['href'])
     return links
 
 
 def find_videos(session: requests.Session, req: requests.Response, path: str):
-    '''
-    Recursively searches for links whos attributes or parents attributes
-    match the filter argument then creates a directory and downloads the video
-    associated whith each link
-    '''
+    '''Recursively searches for links whos attributes or parents attributes
+    match the filter argument. Then downloads the videos if it found any.'''
     soup = BeautifulSoup(req.content, 'html5lib')
     video_tag = soup.find("video")
     if video_tag:
