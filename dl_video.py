@@ -3,7 +3,6 @@ from bs4 import BeautifulSoup
 from os import getcwd, listdir
 from sys import argv
 import html5lib
-from my_user_info import user_info
 from utils import create_dir, display_message, COLORS
 
 
@@ -17,6 +16,7 @@ def get_mp4_link(video_tag):
 
 
 def download_video(link: str, path: str) -> None:
+    '''Downloads the video from [link] if it doesn't exist'''
     file_name = link.split('/')[-1]
     if file_name in listdir(path):
         print(f"{COLORS['WARNING']}Video {file_name} already exists{COLORS['ENDC']}")
@@ -33,6 +33,7 @@ def download_video(link: str, path: str) -> None:
 
 
 def get_auth_token(session: requests.Session, login_link: str) -> str:
+    '''get the authenticity token required to login to 42 intranet'''
     get_req = session.get(login_link)
     soup = BeautifulSoup(get_req.content, 'html5lib')
     auth_token = soup.find("input", {"name": "authenticity_token"}).get('value')
@@ -40,6 +41,9 @@ def get_auth_token(session: requests.Session, login_link: str) -> str:
 
 
 def check_login(login_response: requests.Response) -> bool:
+    '''
+    Checks if we logged in successfuly so that we can quit the program if not
+    '''
     soup = BeautifulSoup(login_response.content, 'html5lib')
     logged_in_attribute = soup.find_all("span", attrs={'data-login':'nammari'})
     if logged_in_attribute:
@@ -73,9 +77,11 @@ def get_links(soup, filters: dict):
 
 
 def find_videos(session: requests.Session, req: requests.Response, path: str):
-    '''Recursively searches for links whos attributes or parents attributes
+    '''
+    Recursively searches for links whos attributes or parents attributes
     match the filter argument then creates a directory and downloads the video
-    associated whith each link'''
+    associated whith each link
+    '''
     soup = BeautifulSoup(req.content, 'html5lib')
     video_tag = soup.find("video")
     if video_tag:
