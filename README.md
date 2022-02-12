@@ -24,7 +24,7 @@ And then all you have to do is follow the instructions that the program gives yo
 
 Here's a short Tutorial gif:
 
-![tutorial_gif](https://github.com/Dovalich/42intra_scraper/blob/main/assets/intra_scraper_gif_tutorial.gif)
+![tutorial_gif](https://github.com/Dovalich/42intra_scraper/blob/main/assets/intra_scraper_tuto.gif)
 
 If you have feedback on the code please let me know! 👨‍🎓
 
