@@ -22,6 +22,9 @@ And then all you have to do is follow the instructions that the program gives yo
 2. enter your 42 intranet password
 3. enter the elearning link you want to scrap for example https://elearning.intra.42.fr/tags/38/notions
 
+Here's a short Tutorial gif:
+
+![tutorial_gif](https://github.com/Dovalich/42intra_scraper/blob/main/assets/intra_scraper_gif_tutorial.gif)
 
 If you have feedback on the code please let me know! 👨‍🎓
 
