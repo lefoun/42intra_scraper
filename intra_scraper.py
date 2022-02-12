@@ -11,7 +11,7 @@ def get_mp4_link(video_tag: BeautifulSoup) -> str:
     '''Returns a link that ends with '.mp4' (if any) by iterating
     on the contents of <video> tag'''
     for content in video_tag:
-        if content != '\n' and 'SD' in content.attrs.values():
+        if content != '\n' and VIDEO_QUALITY in content.attrs.values():
             return content['src']
     return None
 
@@ -91,20 +91,25 @@ def scrap_intranet(payload: dict, login_link: str, elearning_link: str) -> None:
 
 
 if __name__ == "__main__":
-    E_LEARNING_LINK = "https://elearning.intra.42.fr/tags/38/notions"
-    INTRA_PREFIX_LINK = "https://elearning.intra.42.fr"
-    LOGIN_LINK = "https://signin.intra.42.fr/users/sign_in"
-    USER_NAME = input("Please enter your 42 user_name: ")
-    USER_PASSWORD = getpass("\nPlease enter your 42 password(hidden): ")
-    USER_LINK = input(
-        "\nPlease enter the link to the page you want to "
-        f"scrap. Otherwise click 'enter' to defautl to:\n{E_LEARNING_LINK} ")
-    if not USER_LINK:
-        USER_LINK = E_LEARNING_LINK
-    login_payload = {
-        "user[login]": USER_NAME,
-        "user[password]": USER_PASSWORD,
-        "commit": 'Sign in',
-        "authenticity_token": None
-    }
-    scrap_intranet(login_payload, LOGIN_LINK, USER_LINK)
+        E_LEARNING_LINK = "https://elearning.intra.42.fr/tags/38/notions"
+        INTRA_PREFIX_LINK = "https://elearning.intra.42.fr"
+        LOGIN_LINK = "https://signin.intra.42.fr/users/sign_in"
+        USER_NAME = input("Please enter your 42 user_name: ")
+        USER_PASSWORD = getpass("\nPlease enter your 42 password(hidden): ")
+        USER_LINK = input(
+            "\nPlease enter the link to the page you want to "
+            f"scrap. Otherwise click 'enter' to defautl to:\n{E_LEARNING_LINK}")
+        VIDEO_QUALITY = input("\nDo you want to download the videos in SD or HD?"
+                        "\nEnter 'SD' for low quality or 'HD' for high: ")
+        if not USER_LINK:
+            USER_LINK = E_LEARNING_LINK
+        login_payload = {
+            "user[login]": USER_NAME,
+            "user[password]": USER_PASSWORD,
+            "commit": 'Sign in',
+            "authenticity_token": None
+        }
+        if VIDEO_QUALITY == 'HD' or VIDEO_QUALITY == 'SD':
+            scrap_intranet(login_payload, LOGIN_LINK, USER_LINK)
+        else:
+            print("No such quality")
