@@ -50,18 +50,6 @@ def check_login(login_response: requests.Response, usr_name: str) -> bool:
     return False
 
 
-def scrap_intranet(payload: dict, login_link: str, elearning_link: str) -> None:
-    with requests.Session() as session:
-        payload['authenticity_token'] = get_auth_token(session, login_link)
-        login_response = session.post(login_link, data=payload)
-        if check_login(login_response, payload['user[login]']) is False:
-            display_message(login_link, 'FAIL')
-            return
-        display_message(login_link, 'SUCCESS')
-        elearning_response = session.get(elearning_link)
-        find_videos(session, elearning_response, getcwd())
-
-
 def get_links(soup, filters: dict) -> list:
     '''returns a list of links who's parent html attributes match filters'''
     links = []
@@ -88,6 +76,18 @@ def find_videos(session: requests.Session, req: requests.Response, path: str) ->
         for link in links:
             req = session.get(link)
             find_videos(session, req, path + '/' + link.split('/')[-2])
+
+
+def scrap_intranet(payload: dict, login_link: str, elearning_link: str) -> None:
+    with requests.Session() as session:
+        payload['authenticity_token'] = get_auth_token(session, login_link)
+        login_response = session.post(login_link, data=payload)
+        if check_login(login_response, payload['user[login]']):
+            display_message(login_link, 'SUCCESS')
+            elearning_response = session.get(elearning_link)
+            find_videos(session, elearning_response, getcwd())
+        else:
+            display_message(login_link, 'FAIL')
 
 
 if __name__ == "__main__":
