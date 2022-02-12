@@ -1,7 +1,13 @@
 # 42intra_scraper
 
 
-### Scrap the 42 Intranet's elearning videos in a single click.
+Scrap the 42 Intranet's elearning videos in a single click.
+
+### Why you would want to use it ?
+
+1. Adjust speed at your convenience. (The intra doesn't allow this)
+2. Working in a remote location where internet is hit or miss ? Download what you need and you'll have it in your computer.
+3. Have a friend that is freeze and can't access the intra's resources ? You can download the videos, compress them and send them via drive. 
 
 
 ### How to use it:
