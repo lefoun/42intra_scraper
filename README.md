@@ -10,7 +10,7 @@
 git clone git@github.com:Dovalich/42intra_scraper.git
 ```
 ```
-pip3 install -r requirements
+pip3 install -r requirements.txt
 ```
 ```
 python3 main.py
