@@ -1,12 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
 from os import getcwd, listdir
-from sys import argv, exit
+from sys import argv
 import html5lib
 from utils import create_dir, display_message, COLORS
 from getpass import getpass
-import threading
-
+from clint.textui import progress
 
 def get_mp4_link(video_tag: BeautifulSoup) -> str:
     '''Returns a link that ends with '.mp4' (if any) by iterating
@@ -22,17 +21,20 @@ def download_video(link: str, path: str) -> None:
     file_name = link.split('/')[-1]
     if file_name in listdir(path):
         print(f"{COLORS['WARNING']}Video {file_name} already exists{COLORS['ENDC']}")
-        exit()
+        return
     req_download = requests.get(link, stream=True)
     with open(path + '/' + file_name, 'wb') as file:
+        total_length = int(req_download.headers.get('content-length'))
         print("Downloading video "
                 f"{COLORS['OKBLUE']}{file_name}{COLORS['ENDC']}...")
-        for chunk in req_download.iter_content(chunk_size=1024*1024):
+        for chunk in progress.bar(req_download.iter_content(chunk_size=1024),
+                                expected_size=total_length/(1024)):
             if chunk:
                 file.write(chunk)
+                file.flush()
     print("Video "
         f"{COLORS['OKBLUE']}{file_name}{COLORS['ENDC']} finished downloading")
-    exit()
+    return
 
 def get_auth_token(session: requests.Session, login_link: str) -> str:
     '''get the authenticity token required to login to 42 intranet'''
@@ -63,7 +65,7 @@ def get_links(soup, filters: dict) -> list:
     return links
 
 
-def find_videos(session: requests.Session, req: requests.Response, path: str, threads: list) -> None:
+def find_videos(session: requests.Session, req: requests.Response, path: str) -> None:
     '''Recursively searches for links whos attributes or parents attributes
     match the filter argument. Then downloads the videos if it found any.'''
     soup = BeautifulSoup(req.content, 'html5lib')
@@ -71,29 +73,23 @@ def find_videos(session: requests.Session, req: requests.Response, path: str, th
     if video_tag:
         link = get_mp4_link(video_tag)
         create_dir(path)
-        thread = threading.Thread(target=download_video, args=(link, path))
-        threads.append(thread)
-        thread.start()
-        #download_video(link, path)
+        download_video(link, path)
     else:
         links = get_links(soup, {'class': ['notion-grid', 'subnotion-grid']})
         for link in links:
             req = session.get(link)
-            find_videos(session, req, path + '/' + link.split('/')[-2], threads)
+            find_videos(session, req, path + '/' + link.split('/')[-2])
 
 
 def scrap_intranet(payload: dict, login_link: str, elearning_link: str) -> None:
     with requests.Session() as session:
-        threads = []
         payload['authenticity_token'] = get_auth_token(session, login_link)
         login_response = session.post(login_link, data=payload)
         if check_login(login_response, payload['user[login]']):
             display_message(login_link, 'SUCCESS')
             elearning_response = session.get(elearning_link)
-            find_videos(session, elearning_response, getcwd(), threads)
+            find_videos(session, elearning_response, getcwd())
             print("waiting...this may take a while especially for HD videos..")
-            for thread in threads:
-                thread.join()
         else:
             display_message(login_link, 'FAIL')
 
