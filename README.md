@@ -13,7 +13,7 @@ git clone git@github.com:Dovalich/42intra_scraper.git
 pip3 install -r requirements.txt
 ```
 ```
-python3 main.py
+python3 intra_scraper.py
 ```
 
 And then all you have to do is follow the instructions that the program gives you, that is:
