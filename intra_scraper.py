@@ -95,7 +95,7 @@ if __name__ == "__main__":
     INTRA_PREFIX_LINK = "https://elearning.intra.42.fr"
     LOGIN_LINK = "https://signin.intra.42.fr/users/sign_in"
     USER_NAME = input("Please enter your 42 user_name: ")
-    USER_PASSWORD = getpass("\nPlease enter your 42 password: ")
+    USER_PASSWORD = getpass("\nPlease enter your 42 password(hidden): ")
     USER_LINK = input(
         "\nPlease enter the link to the page you want to "
         f"scrap. Otherwise click 'enter' to defautl to:\n{E_LEARNING_LINK} ")
