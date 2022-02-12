@@ -38,11 +38,10 @@ It's fairly simple.
 
 1. The program makes a post request to the intranet using your logins (via the requests module).
 
-2. Once logged-in, it recursively searches for any links that are in the middle of the page (the ones that contain videos)
+2. Once logged-in, it recursively searches for any links that are in the middle of the page (the ones that contain videos).
 
-3. Once it finds a video link it downloads it based on the video quality you chose (SD or HD)
+3. Once it finds a video link, it downloads it based on the video quality you chose (SD or HD).
 
-(there are some steps that I ommited in the explanation like getting the authenticity token using a get request or creating a directory for each section but they are not relevant... Oops I justed explained them)
 
 ### Note 
 
