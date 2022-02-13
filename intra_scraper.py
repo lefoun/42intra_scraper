@@ -89,7 +89,6 @@ def scrap_intranet(payload: dict, login_link: str, elearning_link: str) -> None:
             display_message(login_link, 'SUCCESS')
             elearning_response = session.get(elearning_link)
             find_videos(session, elearning_response, getcwd())
-            print("waiting...this may take a while especially for HD videos..")
         else:
             display_message(login_link, 'FAIL')
 
